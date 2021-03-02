@@ -1,0 +1,29 @@
+[package]
+name = "srt_media"
+version = "0.0.1"
+authors = [
+  "Marc-Antoine Arnaud <maarnaud@media-io.com>"
+]
+description = "Secure Reliable Transport with Media support"
+license = "MIT"
+readme = "README.md"
+edition = "2018"
+
+[dependencies]
+bytes = "1.0"
+cpal = "0.13"
+futures-util = "^0.3"
+log = "0.4"
+pretty_env_logger = { version = "0.4", default-features = false }
+ringbuf = "0.2.3"
+schemars = "0.8.0"
+serde = "^1.0"
+serde_derive = "^1.0"
+srt-protocol = "0.2.0"
+srt-tokio = "0.2.0"
+stainless_ffmpeg = {version = "0.2.2", path = "/Users/marco/dev/nomalab/stainless-ffmpeg"}
+stainless-ffmpeg-sys = {version = "4.2.3", path = "/Users/marco/dev/nomalab/stainless-ffmpeg-sys"}
+
+[dependencies.tokio]
+version = "1.1.0"
+features = ["net", "time", "test-util", "macros", "io-util", "io-std", "sync", "rt", "rt-multi-thread"]
