@@ -22,7 +22,7 @@ impl TryInto<Filter> for GenericFilter {
       .collect();
 
     let name = self.name.clone();
-    let label = self.label.clone();
+    let label = self.label;
 
     Ok(Filter {
       name,

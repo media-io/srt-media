@@ -40,7 +40,7 @@ impl StreamDescriptor {
         // AudioDecoder can decode any codec, not only video
         let audio_decoder = AudioDecoder::new(
           format!("decoder_{}", self.index),
-          &format_context.clone().lock().unwrap(),
+          &format_context.lock().unwrap(),
           self.index as isize,
         )?;
 
@@ -53,7 +53,7 @@ impl StreamDescriptor {
         // VideoDecoder can decode any codec, not only video
         let video_decoder = VideoDecoder::new(
           format!("decoder_{}", self.index),
-          &format_context.clone().lock().unwrap(),
+          &format_context.lock().unwrap(),
           self.index as isize,
         )?;
 

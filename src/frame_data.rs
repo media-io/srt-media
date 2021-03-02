@@ -17,13 +17,3 @@ impl FrameData {
     }
   }
 }
-
-impl Drop for FrameData {
-  fn drop(&mut self) {
-    println!("Drop FrameData");
-    match self {
-      FrameData::AudioVideo(frame) => std::mem::forget(frame),
-      _ => {}
-    }
-  }
-}

@@ -17,7 +17,7 @@ impl FileConnection {
   pub fn receive(&mut self) -> Option<(Instant, Bytes)> {
     let mut data = vec![0; 1316];
 
-    self.file.read(&mut data).unwrap();
+    self.file.read_exact(&mut data).unwrap();
 
     Some((Instant::now(), Bytes::from(data)))
   }

@@ -21,8 +21,8 @@ serde = "^1.0"
 serde_derive = "^1.0"
 srt-protocol = "0.2.0"
 srt-tokio = "0.2.0"
-stainless_ffmpeg = {version = "0.2.2", path = "/Users/marco/dev/nomalab/stainless-ffmpeg"}
-stainless-ffmpeg-sys = {version = "4.2.3", path = "/Users/marco/dev/nomalab/stainless-ffmpeg-sys"}
+stainless_ffmpeg = "0.2.2"
+stainless-ffmpeg-sys = "4.2.3"
 
 [dependencies.tokio]
 version = "1.1.0"

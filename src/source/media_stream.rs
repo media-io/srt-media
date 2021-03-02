@@ -90,39 +90,29 @@ impl MediaStream {
     unsafe {
       let buffer = av_malloc(buffer_size);
 
-      // let cformat = CString::new(format).unwrap();
-      // let av_input_format = av_find_input_format(cformat.as_ptr());
-      // log::info!("Open dynamic buffer");
+      let cformat = CString::new(format).unwrap();
+      let av_input_format = av_find_input_format(cformat.as_ptr());
+      log::info!("Open dynamic buffer");
 
-      // let writable_buffer = 0;
-      // let opaque = Box::new(consumer);
+      let writable_buffer = 0;
+      let opaque = Box::new(consumer);
 
-      // let avio_context = avio_alloc_context(
-      //   buffer as *mut u8,
-      //   buffer_size as i32,
-      //   writable_buffer,
-      //   Box::into_raw(opaque) as *mut c_void,
-      //   Some(read_data),
-      //   None,
-      //   None,
-      // );
-      // (*format_context).pb = avio_context;
+      let avio_context = avio_alloc_context(
+        buffer as *mut u8,
+        buffer_size as i32,
+        writable_buffer,
+        Box::into_raw(opaque) as *mut c_void,
+        Some(read_data),
+        None,
+        None,
+      );
+      (*format_context).pb = avio_context;
 
       log::info!("Open Input");
-      // check_result!(avformat_open_input(
-      //   &mut format_context,
-      //   null_mut(),
-      //   av_input_format,
-      //   null_mut(),
-      // ));
-
-      // let filename = CString::new("/Users/marco/Downloads/generated.ts").unwrap();
-      // let filename = CString::new("srt://194.51.35.43:8998").unwrap();
-      let filename = CString::new("srt://127.0.0.1:3333").unwrap();
       check_result!(avformat_open_input(
         &mut format_context,
-        filename.as_ptr(), // null_mut(),
-        null_mut(),        // av_input_format,
+        null_mut(),
+        av_input_format,
         null_mut(),
       ));
     }

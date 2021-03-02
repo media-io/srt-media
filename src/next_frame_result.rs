@@ -23,12 +23,3 @@ impl fmt::Display for NextFrameResult {
     }
   }
 }
-
-impl Drop for NextFrameResult {
-  fn drop(&mut self) {
-    println!("Drop Next Frame Result");
-    if let NextFrameResult::Frame { frame, .. } = self {
-      std::mem::forget(frame);
-    }
-  }
-}

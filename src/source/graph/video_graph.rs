@@ -15,8 +15,7 @@ pub fn build_video_filter_graph(
       let generic_filter: GenericFilter = video_filter.as_generic_filter(video_decoder).unwrap();
       let filter: Filter = generic_filter.try_into().unwrap();
 
-      let filter = graph.add_filter(&filter).unwrap();
-      filter
+      graph.add_filter(&filter).unwrap()
     })
     .collect();
 

@@ -14,9 +14,7 @@ const SAMPLE_RATE: SampleRate = SampleRate(48_000);
 fn main() {
   pretty_env_logger::init();
 
-  // let mut srt_source = SrtSource::new("srt://127.0.0.1:3333");
-  // let mut srt_source = SrtSource::new("/Users/marco/Downloads/france_info_macron_sub.ts");
-  let mut srt_source = SrtSource::new("/Users/marco/Downloads/generated.ts");
+  let mut srt_source = SrtSource::new("srt://127.0.0.1:3333");
   // let mut srt_source = SrtSource::new("srt://194.51.35.43:8998");
 
   let nb_stream = srt_source.format_context.lock().unwrap().get_nb_streams();

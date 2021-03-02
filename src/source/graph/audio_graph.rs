@@ -14,8 +14,7 @@ pub fn build_audio_filter_graph(
     .map(|audio_filter| {
       let generic_filter: GenericFilter = audio_filter.try_into().unwrap();
       let filter: Filter = generic_filter.try_into().unwrap();
-      let filter = graph.add_filter(&filter).unwrap();
-      filter
+      graph.add_filter(&filter).unwrap()
     })
     .collect();
 

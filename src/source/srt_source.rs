@@ -1,6 +1,6 @@
 use super::{decoder::Decoder, media_stream::MediaStream, stream_descriptor::StreamDescriptor};
 use crate::{
-  connection::Connection, connection::FileConnection, next_frame_result::NextFrameResult, Error,
+  connection::Connection, next_frame_result::NextFrameResult, Error,
   Result,
 };
 use bytes::Buf;
@@ -36,8 +36,7 @@ impl SrtSource {
     let cloned_source_url = source_url.to_string();
 
     let thread = std::thread::spawn(move || {
-      // let mut connection = Connection::open_connection(&cloned_source_url).unwrap();
-      let mut connection = FileConnection::open_connection(&cloned_source_url).unwrap();
+      let mut connection = Connection::open_connection(&cloned_source_url).unwrap();
 
       let ring_buffer = RingBuffer::<u8>::new(100 * 1024 * 1024);
       let (mut producer, consumer) = ring_buffer.split();
@@ -172,28 +171,24 @@ impl SrtSource {
               //   return Ok(());
               // }
 
-              return Ok(NextFrameResult::Frame {
+              Ok(NextFrameResult::Frame {
                 stream_index,
                 frame,
-              });
+              })
             }
             Ok(None) => {
-              return Ok(NextFrameResult::WaitMore);
+              Ok(NextFrameResult::WaitMore)
             }
             Err(message) => {
               log::error!("{:?}", message);
-              if message == "Invalid data found when processing input" {
-                return Ok(NextFrameResult::WaitMore);
+              if message == "Invalid data found when processing input" ||
+                message == "Resource temporarily unavailable" {
+                Ok(NextFrameResult::WaitMore)
+              } else {
+                Err(Error::from(message))                
               }
-              if message == "Resource temporarily unavailable" {
-                return Ok(NextFrameResult::WaitMore);
-              }
-
-              return Err(Error::from(message));
-            } // }
-          };
-
-          // Ok(NextFrameResult::Nothing)
+            }
+          }
         } else {
           Ok(NextFrameResult::Nothing)
         }
