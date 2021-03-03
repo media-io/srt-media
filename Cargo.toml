@@ -1,6 +1,6 @@
 [package]
 name = "srt_media"
-version = "0.0.1"
+version = "0.1.0"
 authors = [
   "Marc-Antoine Arnaud <maarnaud@media-io.com>"
 ]
