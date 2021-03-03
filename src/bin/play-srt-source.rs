@@ -7,15 +7,15 @@ use srt_media::{
   },
   FrameData, NextFrameResult,
 };
-use stainless_ffmpeg_sys::AVMediaType::AVMEDIA_TYPE_AUDIO;
+use stainless_ffmpeg::prelude::*;
 
 const SAMPLE_RATE: SampleRate = SampleRate(48_000);
 
 fn main() {
   pretty_env_logger::init();
 
-  let mut srt_source = SrtSource::new("srt://127.0.0.1:3333");
-  // let mut srt_source = SrtSource::new("srt://194.51.35.43:8998");
+  let url = std::env::args().last().unwrap();
+  let mut srt_source = SrtSource::new(&url);
 
   let nb_stream = srt_source.format_context.lock().unwrap().get_nb_streams();
 
@@ -30,7 +30,7 @@ fn main() {
 
     log::info!("Stream {}: {:?}", i, stream_type);
 
-    if stream_type == AVMEDIA_TYPE_AUDIO {
+    if stream_type == AVMediaType::AVMEDIA_TYPE_AUDIO {
       first_audio_stream = Some(i);
     }
   }
@@ -54,7 +54,7 @@ fn main() {
 
   srt_source.select_streams(selection).unwrap();
 
-  let (mut producer, consumer) = RingBuffer::<f32>::new(50 * 1024 * 1024).split();
+  let (mut producer, consumer) = RingBuffer::<f32>::new(1024 * 1024).split();
 
   let _stream = audio_player(consumer);
 
@@ -69,7 +69,7 @@ fn main() {
           unsafe {
             let av_frame = av_frame.frame;
 
-            let size = ((*av_frame).channels * (*av_frame).nb_samples * 4) as usize;
+            let size = ((*av_frame).channels * (*av_frame).nb_samples) as usize;
 
             log::info!(
               "Frame {} samples, {} channels, {} bytes // {} bytes",
@@ -81,14 +81,13 @@ fn main() {
 
             let samples: Vec<i32> = Vec::from_raw_parts((*av_frame).data[0] as _, size, size);
 
-            let samples: Vec<f32> = samples
+            let float_samples: Vec<f32> = samples
               .iter()
               .map(|value| (*value as f32) / i32::MAX as f32)
               .collect();
 
-            // println!("{:?}", samples);
-
-            producer.push_slice(&samples);
+            producer.push_slice(&float_samples);
+            std::mem::forget(samples);
           }
         }
       }
@@ -120,16 +119,15 @@ fn audio_player(mut consumer: Consumer<f32>) -> Stream {
     .with_sample_rate(SAMPLE_RATE);
 
   let config = supported_config.into();
-  let mut started = false;
 
   device
     .build_output_stream(
       &config,
       move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
-        if consumer.len() > 2 * 1024 * 1024 {
-          started = true;
+        for i in 0..data.len() {
+          data[i] = 0.0;
         }
-        if started {
+        if consumer.len() > data.len() {
           consumer.pop_slice(data);
         }
       },

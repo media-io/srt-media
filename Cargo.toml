@@ -21,8 +21,7 @@ serde = "^1.0"
 serde_derive = "^1.0"
 srt-protocol = "0.2.0"
 srt-tokio = "0.2.0"
-stainless_ffmpeg = "0.2.2"
-stainless-ffmpeg-sys = "4.2.3"
+stainless_ffmpeg = { version = "0.2.5" }
 
 [dependencies.tokio]
 version = "1.1.0"

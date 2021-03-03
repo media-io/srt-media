@@ -1,7 +1,4 @@
-mod file_connection;
-
-pub use file_connection::FileConnection;
-
+use super::SourceStream;
 use crate::Result;
 use bytes::Bytes;
 use futures_util::TryStreamExt;
@@ -9,13 +6,13 @@ use srt_tokio::{SrtSocket, SrtSocketBuilder};
 use std::{cell::RefCell, rc::Rc, time::Instant};
 use tokio::runtime::Runtime;
 
-pub struct Connection {
+pub struct SrtSourceStream {
   socket: Rc<RefCell<SrtSocket>>,
   runtime: Runtime,
 }
 
-impl Connection {
-  pub fn open_connection(url: &str) -> Result<Self> {
+impl SrtSourceStream {
+  pub fn open(url: &str) -> Result<Self> {
     let runtime = Runtime::new().unwrap();
 
     let socket = runtime.block_on(async {
@@ -37,10 +34,12 @@ impl Connection {
 
     log::info!("SRT connected");
 
-    Ok(Connection { socket, runtime })
+    Ok(SrtSourceStream { socket, runtime })
   }
+}
 
-  pub fn receive(&mut self) -> Option<(Instant, Bytes)> {
+impl SourceStream for SrtSourceStream {
+  fn receive(&mut self) -> Option<(Instant, Bytes)> {
     let socket = self.socket.clone();
     self
       .runtime

@@ -1,6 +1,5 @@
 use ringbuf::Consumer;
-use stainless_ffmpeg::{audio_decoder::AudioDecoder, filter_graph::FilterGraph};
-use stainless_ffmpeg_sys::*;
+use stainless_ffmpeg::prelude::*;
 use std::collections::HashMap;
 use std::ffi::{c_void, CStr, CString};
 use std::io::{Cursor, Error, ErrorKind, Result};
@@ -20,7 +19,7 @@ macro_rules! check_result {
     let errnum = $condition;
     if errnum < 0 {
       let mut data = [0i8; AV_ERROR_MAX_STRING_SIZE];
-      av_strerror(errnum, data.as_mut_ptr(), AV_ERROR_MAX_STRING_SIZE as u64);
+      av_strerror(errnum, data.as_mut_ptr(), AV_ERROR_MAX_STRING_SIZE);
       $block;
       return Err(Error::new(
         ErrorKind::InvalidInput,
@@ -32,7 +31,7 @@ macro_rules! check_result {
     let errnum = $condition;
     if errnum < 0 {
       let mut data = [0i8; AV_ERROR_MAX_STRING_SIZE];
-      av_strerror(errnum, data.as_mut_ptr(), AV_ERROR_MAX_STRING_SIZE as u64);
+      av_strerror(errnum, data.as_mut_ptr(), AV_ERROR_MAX_STRING_SIZE);
       return Err(Error::new(
         ErrorKind::InvalidInput,
         to_string(data.as_ptr()),

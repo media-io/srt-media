@@ -1,7 +1,6 @@
 use super::{decoder::Decoder, media_stream::MediaStream, stream_descriptor::StreamDescriptor};
 use crate::{
-  connection::Connection, next_frame_result::NextFrameResult, Error,
-  Result,
+  next_frame_result::NextFrameResult, source_stream::SourceStreamBuilder, Error, Result,
 };
 use bytes::Buf;
 use ringbuf::RingBuffer;
@@ -26,9 +25,6 @@ pub struct SrtSource {
 }
 
 impl SrtSource {
-  // pub fn new() -> Self {
-  // }
-
   pub fn new(source_url: &str) -> Self {
     log::info!("Opening source: {}", source_url);
 
@@ -36,12 +32,13 @@ impl SrtSource {
     let cloned_source_url = source_url.to_string();
 
     let thread = std::thread::spawn(move || {
-      let mut connection = Connection::open_connection(&cloned_source_url).unwrap();
+      let mut builder = SourceStreamBuilder::from_url(&cloned_source_url).unwrap();
+      let source_stream = builder.get_source_stream();
 
       let ring_buffer = RingBuffer::<u8>::new(100 * 1024 * 1024);
       let (mut producer, consumer) = ring_buffer.split();
 
-      let (_instant, bytes) = connection
+      let (_instant, bytes) = source_stream
         .receive()
         .expect("Could not get the first bytes from SRT stream.");
 
@@ -70,7 +67,7 @@ impl SrtSource {
 
       let mut got_stream_info = false;
 
-      while let Some((_instant, bytes)) = connection.receive() {
+      while let Some((_instant, bytes)) = source_stream.receive() {
         log::trace!("{:?}", bytes);
         let size = bytes.len();
         let mut cursor = Cursor::new(bytes);
@@ -176,16 +173,15 @@ impl SrtSource {
                 frame,
               })
             }
-            Ok(None) => {
-              Ok(NextFrameResult::WaitMore)
-            }
+            Ok(None) => Ok(NextFrameResult::WaitMore),
             Err(message) => {
               log::error!("{:?}", message);
-              if message == "Invalid data found when processing input" ||
-                message == "Resource temporarily unavailable" {
+              if message == "Invalid data found when processing input"
+                || message == "Resource temporarily unavailable"
+              {
                 Ok(NextFrameResult::WaitMore)
               } else {
-                Err(Error::from(message))                
+                Err(Error::from(message))
               }
             }
           }

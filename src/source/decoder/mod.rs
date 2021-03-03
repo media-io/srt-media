@@ -2,11 +2,7 @@ mod inner_decoder;
 
 use crate::frame_data::FrameData;
 use inner_decoder::InnerDecoder;
-use stainless_ffmpeg::{
-  audio_decoder::AudioDecoder, check_result, filter_graph::FilterGraph, frame::Frame,
-  packet::Packet, tools, video_decoder::VideoDecoder,
-};
-use stainless_ffmpeg_sys::*;
+use stainless_ffmpeg::prelude::*;
 
 pub struct Decoder {
   inner_decoder: InnerDecoder,
@@ -47,27 +43,6 @@ impl Decoder {
           let av_frame = av_frame_alloc();
           let ret_code = avcodec_receive_frame(audio_decoder.codec_context, av_frame);
           check_result!(ret_code);
-
-          let size = ((*av_frame).channels * (*av_frame).nb_samples * 4) as usize;
-
-          // log::info!(
-          //   "DECODED Frame {} samples, {} channels, {} bytes, {}, size: {}",
-          //   (*av_frame).nb_samples,
-          //   (*av_frame).channels,
-          //   (*av_frame).linesize[0],
-          //   (*av_frame).format,
-          //   size
-          // );
-
-          let samples: Vec<f32> = Vec::from_raw_parts((*av_frame).data[0] as _, size, size);
-
-          //   let samples : Vec<f32> =
-          //     samples
-          //       .iter()
-          //       .map(|value| (*value as f32) / i32::MAX as f32)
-          //       .collect();
-
-          println!("{:?}", samples);
 
           let frame = Frame {
             frame: av_frame,
