@@ -66,13 +66,15 @@ unsafe extern "C" fn read_data(opaque: *mut c_void, raw_buffer: *mut u8, buf_siz
   }
 
   let vec = Vec::from_raw_parts(raw_buffer, buf_size as usize, buf_size as usize);
+  // is it possible to optimize it ?
+  let vec_data = vec.clone();
+  mem::forget(vec);
 
-  let mut buffer = Cursor::new(vec);
+  let mut buffer = Cursor::new(vec_data);
   let size = consumer
     .write_into(&mut buffer, Some(buf_size as usize))
     .unwrap();
 
-  mem::forget(buffer);
   size as i32
 }
 

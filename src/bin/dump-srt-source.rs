@@ -2,7 +2,7 @@ use srt_media::{
   source::{SrtSource, StreamDescriptor},
   NextFrameResult,
 };
-use stainless_ffmpeg_sys::AVMediaType::{AVMEDIA_TYPE_AUDIO, AVMEDIA_TYPE_VIDEO};
+use stainless_ffmpeg::prelude::*;
 
 fn main() {
   pretty_env_logger::init();
@@ -24,10 +24,10 @@ fn main() {
 
     log::info!("Streams: {:?}", stream_type);
 
-    if stream_type == AVMEDIA_TYPE_VIDEO {
+    if stream_type == AVMediaType::AVMEDIA_TYPE_VIDEO {
       first_video_stream = Some(i);
     }
-    if stream_type == AVMEDIA_TYPE_AUDIO {
+    if stream_type == AVMediaType::AVMEDIA_TYPE_AUDIO {
       first_audio_stream = Some(i);
     }
   }
