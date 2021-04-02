@@ -93,7 +93,6 @@ fn main() {
       }
       _ => {}
     }
-    std::mem::forget(next_frame);
   }
 }
 
